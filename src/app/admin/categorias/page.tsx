@@ -1,20 +1,5 @@
+"use client";
 import Link from "next/link";
-
-export default function AdminCategoriasPage() {
-  return (
-    <div className="min-h-screen bg-stone-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <Link href="/admin/dashboard" className="text-sm text-navy-600 hover:underline mb-4 inline-block">
-          ← Dashboard
-        </Link>
-        <h1 className="text-2xl font-semibold text-navy-900 mb-2">Categorias</h1>
-        <p className="text-stone-600 mb-8">
-          Reforma completa · Drywall · Gesso · Hidráulica · Acabamentos · Antes e depois
-        </p>
-        <div className="bg-white rounded-xl border border-stone-200 p-8 text-center text-stone-500">
-          Categorias seedadas no banco. Complete o CRUD conforme necessário.
-        </div>
-      </div>
-    </div>
-  );
-}
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+export default function AdminCategoriasPage(){const [items,setItems]=useState<any[]>([]);const [name,setName]=useState("");const [description,setDescription]=useState("");const [saving,setSaving]=useState(false);const [message,setMessage]=useState("");async function load(){const s=createClient();const {data}=await s.from("categories").select("*").order("display_order");setItems(data??[])}useEffect(()=>{load()},[]);async function add(){if(!name.trim())return;setSaving(true);const s=createClient();const {error}=await s.from("categories").insert({name:name.trim(),slug:name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,""),description:description.trim(),display_order:items.length,published:true});setMessage(error?error.message:"Categoria criada.");if(!error){setName("");setDescription("");await load()}setSaving(false)}async function toggle(item:any){const s=createClient();await s.from("categories").update({published:!item.published}).eq("id",item.id);await load()}async function remove(item:any){if(!confirm(`Excluir ${item.name}?`))return;const s=createClient();const {error}=await s.from("categories").delete().eq("id",item.id);setMessage(error?error.message:"Categoria excluída.");if(!error)await load()}return <div className="min-h-screen bg-stone-100"><header className="border-b border-stone-200 bg-white"><div className="mx-auto max-w-7xl px-5 py-5"><Link href="/admin/dashboard" className="text-xs uppercase tracking-widest text-stone-500">← Dashboard</Link><h1 className="mt-1 text-xl font-semibold text-navy-950">Categorias</h1></div></header><main className="mx-auto max-w-5xl space-y-7 px-5 py-8">{message&&<div className="bg-white p-3 text-sm text-navy-900">{message}</div>}<section className="bg-white p-6 sm:p-8"><h2 className="text-xl font-semibold text-navy-950">Nova categoria</h2><div className="mt-5 grid gap-4 sm:grid-cols-2"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Nome" className="h-11 rounded-lg border border-stone-300 px-3 text-sm"/><input value={description} onChange={e=>setDescription(e.target.value)} placeholder="Descrição" className="h-11 rounded-lg border border-stone-300 px-3 text-sm"/></div><button onClick={add} disabled={saving} className="mt-4 rounded-lg bg-navy-900 px-5 py-2.5 text-sm font-semibold text-white">{saving?"Salvando…":"Adicionar categoria"}</button></section><section className="divide-y divide-stone-100 bg-white border border-stone-200">{items.map(item=><div key={item.id} className="flex items-center justify-between gap-4 p-5"><div><h3 className="font-semibold text-navy-900">{item.name}</h3><p className="text-sm text-stone-500">{item.description||"Sem descrição"}</p></div><div className="flex gap-2"><button onClick={()=>toggle(item)} className="rounded border border-stone-300 px-3 py-2 text-xs">{item.published?"Ocultar":"Publicar"}</button><button onClick={()=>remove(item)} className="rounded border border-red-200 px-3 py-2 text-xs text-red-600">Excluir</button></div></div>)}</section></main></div>}
