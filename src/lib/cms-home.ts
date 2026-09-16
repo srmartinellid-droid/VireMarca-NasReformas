@@ -6,7 +6,12 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
   const [{ data: row }, { data: categories }, { data: projects }] = await Promise.all([
     supabase.from("site_content").select("value").eq("key", "homepage").maybeSingle(),
     supabase.from("categories").select("id,slug,name,description,image,display_order,published").eq("published", true).order("display_order").order("id"),
-    supabase.from("projects").select("id,title,display_order").eq("published", true).order("display_order").order("id"),
+    supabase
+      .from("projects")
+      .select("id,title,display_order,project_images(id,url,alt,display_order)")
+      .eq("published", true)
+      .order("display_order")
+      .order("id"),
   ]);
 
   const value = parseValue(row?.value);
@@ -30,28 +35,23 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
     image: category.image ?? "",
   }));
 
-  const projectIds = (projects ?? []).map((project) => project.id);
-  if (projectIds.length) {
-    const { data: projectImages } = await supabase
-      .from("project_images")
-      .select("id,project_id,url,alt,display_order")
-      .in("project_id", projectIds)
-      .order("display_order")
-      .order("id");
+  const projectTitles = new Map((projects ?? []).map((project) => [project.id, project.title]));
+  const albumImages: GalleryImage[] = (projects ?? []).flatMap((project) =>
+    (project.project_images ?? [])
+      .slice()
+      .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0) || a.id - b.id)
+      .map((item) => ({
+        image: item.url,
+        alt: item.alt || projectTitles.get(project.id) || "Obra Nascimento Reformas",
+        label: projectTitles.get(project.id) || "",
+      }))
+  );
 
-    const projectTitles = new Map((projects ?? []).map((project) => [project.id, project.title]));
-    const albumImages: GalleryImage[] = (projectImages ?? []).map((item) => ({
-      image: item.url,
-      alt: item.alt || projectTitles.get(item.project_id) || "Obra Nascimento Reformas",
-      label: projectTitles.get(item.project_id) || "",
-    }));
-
-    const existing = new Set(content.gallery.images.map((item) => item.image));
-    content.gallery.images = [
-      ...content.gallery.images,
-      ...albumImages.filter((item) => item.image && !existing.has(item.image)),
-    ];
-  }
+  const existing = new Set(content.gallery.images.map((item) => item.image));
+  content.gallery.images = [
+    ...content.gallery.images,
+    ...albumImages.filter((item) => item.image && !existing.has(item.image)),
+  ];
 
   return content;
 }
