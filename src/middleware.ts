@@ -23,38 +23,30 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data } = await supabase.auth.getUser();
+  const { data, error: userError } = await supabase.auth.getUser();
   const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
   const isLoginRoute = request.nextUrl.pathname === "/admin/login";
 
   if (isAdminRoute && !isLoginRoute) {
-    if (!data.user) {
+    if (userError || !data.user) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/admin/login";
       loginUrl.searchParams.set("next", request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    const { data: admin } = await supabase
-      .from("admins")
-      .select("user_id")
-      .eq("user_id", data.user.id)
-      .maybeSingle();
+    const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
 
-    if (!admin) {
-      await supabase.auth.signOut();
-      return NextResponse.redirect(new URL("/admin/login?error=unauthorized", request.url));
+    if (adminError || !isAdmin) {
+      const loginUrl = new URL("/admin/login", request.url);
+      loginUrl.searchParams.set("error", "unauthorized");
+      return NextResponse.redirect(loginUrl);
     }
   }
 
-  if (isLoginRoute && data.user) {
-    const { data: admin } = await supabase
-      .from("admins")
-      .select("user_id")
-      .eq("user_id", data.user.id)
-      .maybeSingle();
-
-    if (admin) {
+  if (isLoginRoute && data.user && !userError) {
+    const { data: isAdmin } = await supabase.rpc("is_admin");
+    if (isAdmin) {
       return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     }
   }
