@@ -1,21 +1,79 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { DEFAULT_HOMEPAGE, type HomepageContent } from "@/lib/cms";
 
 export default function AdminConteudoPage() {
-  return (
-    <div className="min-h-screen bg-stone-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <Link href="/admin/dashboard" className="text-sm text-navy-600 hover:underline mb-4 inline-block">
-          ← Dashboard
-        </Link>
-        <h1 className="text-2xl font-semibold text-navy-900 mb-2">Conteúdo</h1>
-        <p className="text-stone-600 mb-8">
-          Edição de hero, textos de seções, serviços, sobre, CTA e região.
-        </p>
-        <div className="bg-white rounded-xl border border-stone-200 p-8 text-center text-stone-500">
-          Conteúdo estrutural está em <code>src/lib/site.ts</code>.  
-          Para CMS dinâmico, use a tabela <code>site_content</code>.
+  const [content, setContent] = useState<HomepageContent>(DEFAULT_HOMEPAGE);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const { data } = await supabase.from("site_content").select("value").eq("key", "homepage").maybeSingle();
+      if (data?.value) setContent({ ...DEFAULT_HOMEPAGE, ...(data.value as HomepageContent), hero: { ...DEFAULT_HOMEPAGE.hero, ...((data.value as HomepageContent).hero ?? {}) }, areas: { ...DEFAULT_HOMEPAGE.areas, ...((data.value as HomepageContent).areas ?? {}) }, portfolio: { ...DEFAULT_HOMEPAGE.portfolio, ...((data.value as HomepageContent).portfolio ?? {}) }, method: { ...DEFAULT_HOMEPAGE.method, ...((data.value as HomepageContent).method ?? {}) }, finalCta: { ...DEFAULT_HOMEPAGE.finalCta, ...((data.value as HomepageContent).finalCta ?? {}) } });
+      setLoading(false);
+    })();
+  }, []);
+
+  async function save() {
+    setSaving(true); setMessage("");
+    const supabase = createClient();
+    const { error } = await supabase.from("site_content").upsert({ key: "homepage", value: content, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    setMessage(error ? `Erro: ${error.message}` : "Conteúdo publicado com sucesso.");
+    setSaving(false);
+  }
+
+  async function uploadHero(file: File) {
+    setUploading(true); setMessage("");
+    const supabase = createClient();
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `hero/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("site-media").upload(path, file, { contentType: file.type, upsert: false });
+    if (error) { setMessage(`Upload: ${error.message}`); setUploading(false); return; }
+    const { data } = supabase.storage.from("site-media").getPublicUrl(path);
+    setContent((current) => ({ ...current, hero: { ...current.hero, images: [...current.hero.images, { image: data.publicUrl, alt: "Obra Nascimento Reformas" }] } }));
+    setUploading(false);
+  }
+
+  function field(section: keyof HomepageContent, key: string, value: string) {
+    setContent((current) => ({ ...current, [section]: { ...(current[section] as object), [key]: value } } as HomepageContent));
+  }
+
+  if (loading) return <div className="min-h-screen bg-stone-100 p-8 text-stone-600">Carregando conteúdo…</div>;
+
+  return <div className="min-h-screen bg-stone-100">
+    <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/90 backdrop-blur"><div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4"><div><Link href="/admin/dashboard" className="text-xs uppercase tracking-widest text-stone-500">← Dashboard</Link><h1 className="mt-1 text-xl font-semibold text-navy-950">Editor do site</h1></div><button onClick={save} disabled={saving} className="rounded-lg bg-navy-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-navy-800 disabled:opacity-50">{saving ? "Publicando…" : "Publicar alterações"}</button></div></header>
+    <main className="mx-auto max-w-7xl space-y-8 px-5 py-8">
+      {message && <div className="rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm text-navy-900">{message}</div>}
+      <EditorCard title="Hero · primeira impressão" subtitle="Textos, imagens, intervalo e intensidade do degradê ficam sob seu controle.">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Input label="Eyebrow" value={content.hero.eyebrow} onChange={(v) => field("hero", "eyebrow", v)} />
+          <Input label="Título" value={content.hero.title} onChange={(v) => field("hero", "title", v)} />
+          <Input label="Destaque colorido" value={content.hero.highlight} onChange={(v) => field("hero", "highlight", v)} />
+          <Input label="Cor de destaque" value={content.hero.accentColor} onChange={(v) => field("hero", "accentColor", v)} type="color" />
+          <TextArea label="Descrição" value={content.hero.description} onChange={(v) => field("hero", "description", v)} />
+          <TextArea label="Texto do card" value={content.hero.panelText} onChange={(v) => field("hero", "panelText", v)} />
+          <Input label="Título do card" value={content.hero.panelTitle} onChange={(v) => field("hero", "panelTitle", v)} />
+          <div className="grid grid-cols-2 gap-4"><Input label="Intervalo (ms)" value={String(content.hero.heroInterval)} onChange={(v) => setContent(c => ({...c, hero:{...c.hero, heroInterval: Number(v) || 6500}}))} type="number" min="2500" /><Input label="Degradê (%)" value={String(content.hero.heroOverlay)} onChange={(v) => setContent(c => ({...c, hero:{...c.hero, heroOverlay: Math.min(90, Math.max(0, Number(v) || 0))}}))} type="number" min="0" max="90" /></div>
         </div>
-      </div>
-    </div>
-  );
+        <div className="mt-8 border-t border-stone-200 pt-7"><div className="flex items-center justify-between"><div><h3 className="font-semibold text-navy-900">Imagens da hero</h3><p className="text-sm text-stone-500">A rotação usa crossfade suave. Você pode reordenar removendo e reenviando.</p></div><label className="cursor-pointer rounded-lg border border-navy-900 px-4 py-2 text-sm font-semibold text-navy-900 hover:bg-navy-900 hover:text-white">{uploading ? "Enviando…" : "Adicionar imagem"}<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="hidden" disabled={uploading} onChange={(e) => e.target.files?.[0] && uploadHero(e.target.files[0])} /></label></div><div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{content.hero.images.map((image, index) => <div key={image.image} className="group relative overflow-hidden border border-stone-200 bg-stone-200"><img src={image.image} alt={image.alt || ""} className="aspect-[4/3] w-full object-cover" /><button onClick={() => setContent(c => ({...c, hero:{...c.hero, images:c.hero.images.filter((_,i)=>i!==index)}}))} className="absolute right-2 top-2 rounded bg-black/65 px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">Remover</button><div className="p-2 text-xs text-stone-500">Slide {String(index+1).padStart(2,"0")}</div></div>)}</div></div>
+      </EditorCard>
+
+      <EditorCard title="Áreas de atuação" subtitle="Texto solicitado para a seção institucional."><div className="grid gap-5 lg:grid-cols-2"><Input label="Eyebrow" value={content.areas.eyebrow} onChange={(v)=>field("areas","eyebrow",v)} /><Input label="Título" value={content.areas.title} onChange={(v)=>field("areas","title",v)} /><Input label="Título em destaque" value={content.areas.highlight} onChange={(v)=>field("areas","highlight",v)} /><TextArea label="Descrição" value={content.areas.description} onChange={(v)=>field("areas","description",v)} /></div></EditorCard>
+      <EditorCard title="Portfólio / galeria" subtitle="A galeria é alimentada pelos projetos publicados no banco."><div className="grid gap-5 lg:grid-cols-2"><Input label="Eyebrow" value={content.portfolio.eyebrow} onChange={(v)=>field("portfolio","eyebrow",v)} /><Input label="Título" value={content.portfolio.title} onChange={(v)=>field("portfolio","title",v)} /><TextArea label="Descrição" value={content.portfolio.description} onChange={(v)=>field("portfolio","description",v)} /><Input label="Título quando vazio" value={content.portfolio.emptyTitle} onChange={(v)=>field("portfolio","emptyTitle",v)} /><TextArea label="Mensagem quando vazio" value={content.portfolio.emptyText} onChange={(v)=>field("portfolio","emptyText",v)} /></div></EditorCard>
+      <EditorCard title="Método" subtitle="Seção de processo e confiança."><div className="grid gap-5 lg:grid-cols-2"><Input label="Eyebrow" value={content.method.eyebrow} onChange={(v)=>field("method","eyebrow",v)} /><Input label="Título" value={content.method.title} onChange={(v)=>field("method","title",v)} /><Input label="Destaque" value={content.method.highlight} onChange={(v)=>field("method","highlight",v)} /><TextArea label="Descrição" value={content.method.description} onChange={(v)=>field("method","description",v)} /></div></EditorCard>
+      <EditorCard title="CTA final" subtitle="Última chamada para orçamento."><div className="grid gap-5 lg:grid-cols-3"><Input label="Título" value={content.finalCta.title} onChange={(v)=>field("finalCta","title",v)} /><Input label="Botão" value={content.finalCta.button} onChange={(v)=>field("finalCta","button",v)} /><TextArea label="Descrição" value={content.finalCta.description} onChange={(v)=>field("finalCta","description",v)} /></div></EditorCard>
+      <div className="flex justify-end pb-10"><button onClick={save} disabled={saving} className="rounded-lg bg-navy-900 px-6 py-3 text-sm font-semibold text-white">{saving ? "Publicando…" : "Publicar alterações"}</button></div>
+    </main>
+  </div>;
 }
+
+function EditorCard({title, subtitle, children}:{title:string;subtitle:string;children:React.ReactNode}) { return <section className="border border-stone-200 bg-white p-6 shadow-sm sm:p-8"><div className="mb-7 border-b border-stone-100 pb-5"><h2 className="text-xl font-semibold tracking-tight text-navy-950">{title}</h2><p className="mt-1 text-sm text-stone-500">{subtitle}</p></div>{children}</section> }
+function Input({label,value,onChange,type="text",min,max}:{label:string;value:string;onChange:(v:string)=>void;type?:string;min?:string;max?:string}) { return <label className="block"><span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-500">{label}</span><input type={type} value={value} min={min} max={max} onChange={e=>onChange(e.target.value)} className="h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-navy-900 outline-none transition focus:border-navy-700 focus:ring-2 focus:ring-navy-700/10" /></label> }
+function TextArea({label,value,onChange}:{label:string;value:string;onChange:(v:string)=>void}) { return <label className="block"><span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-500">{label}</span><textarea value={value} onChange={e=>onChange(e.target.value)} rows={4} className="w-full rounded-lg border border-stone-300 bg-white p-3 text-sm leading-relaxed text-navy-900 outline-none transition focus:border-navy-700 focus:ring-2 focus:ring-navy-700/10" /></label> }
