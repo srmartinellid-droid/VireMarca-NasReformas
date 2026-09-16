@@ -7,42 +7,41 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-navy-900 text-stone-100">
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+    <footer className="border-t border-stone-200 bg-[#F3F1EC] text-navy-950">
+      <div className="mx-auto max-w-[1280px] px-5 py-14 sm:px-8 lg:px-12 lg:py-16">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-[1.3fr_.7fr_.9fr] md:gap-16">
           <div>
-            <Logo variant="light" size="md" />
-            <p className="mt-4 text-stone-300 text-sm leading-relaxed max-w-xs">
-              Reformas residenciais com precisão e cuidado com o acabamento.
-              Atuação em Palhoça e Grande Florianópolis.
+            <div className="inline-flex bg-white px-3 py-2 ring-1 ring-stone-200">
+              <Logo variant="dark" size="md" />
+            </div>
+            <p className="mt-5 max-w-sm text-sm leading-7 text-stone-600">
+              Reformas residenciais com precisão e cuidado com o acabamento. Atuação em Palhoça e Grande Florianópolis.
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-400 mb-4">
-              Navegação
-            </h3>
-            <ul className="space-y-2">
-              <li><Link href="/" className="text-stone-200 hover:text-white transition-colors">Início</Link></li>
-              <li><Link href="/#servicos" className="text-stone-200 hover:text-white transition-colors">Serviços</Link></li>
-              <li><Link href="/#galeria" className="text-stone-200 hover:text-white transition-colors">Galeria</Link></li>
-              <li><Link href="/quem-somos" className="text-stone-200 hover:text-white transition-colors">Quem somos</Link></li>
-              <li><Link href="/privacidade" className="text-stone-200 hover:text-white transition-colors">Política de privacidade</Link></li>
+            <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[.2em] text-stone-500">Navegação</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/" className="text-navy-900 transition-colors hover:text-accent-600">Início</Link></li>
+              <li><Link href="/#servicos" className="text-navy-900 transition-colors hover:text-accent-600">Serviços</Link></li>
+              <li><Link href="/#galeria" className="text-navy-900 transition-colors hover:text-accent-600">Galeria</Link></li>
+              <li><Link href="/quem-somos" className="text-navy-900 transition-colors hover:text-accent-600">Quem somos</Link></li>
+              <li><Link href="/privacidade" className="text-stone-500 transition-colors hover:text-navy-900">Política de privacidade</Link></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-400 mb-4">Contato</h3>
-            <ul className="space-y-3 text-stone-200">
-              <li><a href={buildWhatsAppUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">WhatsApp: {SITE.whatsappDisplay}</a></li>
-              <li className="text-sm text-stone-400">{SITE.region}</li>
+            <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[.2em] text-stone-500">Contato</h3>
+            <ul className="space-y-3 text-sm">
+              <li><a href={buildWhatsAppUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="font-medium text-navy-900 transition-colors hover:text-accent-600">WhatsApp: {SITE.whatsappDisplay}</a></li>
+              <li className="text-stone-500">{SITE.region}</li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-navy-700 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-stone-400">
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-stone-300 pt-6 text-xs text-stone-500 sm:flex-row sm:items-center">
           <p>© {year} {SITE.name}. Todos os direitos reservados.</p>
-          <p className="text-xs">Um site criado por{" "}<a href="https://viremarca.com.br" target="_blank" rel="noopener noreferrer" className="underline hover:text-stone-200">VireMarca</a></p>
+          <p>Um site criado por <a href="https://viremarca.com.br" target="_blank" rel="noopener noreferrer" className="font-semibold text-navy-800 underline decoration-stone-300 underline-offset-4 hover:text-accent-600">VireMarca</a></p>
         </div>
       </div>
     </footer>
