@@ -34,7 +34,7 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
   if (projectIds.length) {
     const { data: projectImages } = await supabase
       .from("project_images")
-      .select("project_id,url,alt,display_order")
+      .select("id,project_id,url,alt,display_order")
       .in("project_id", projectIds)
       .order("display_order")
       .order("id");
