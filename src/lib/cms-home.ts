@@ -1,6 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_HOMEPAGE, type GalleryImage, type HomepageContent } from "@/lib/cms-defaults";
 
+type ProjectRow = {
+  id: number;
+  title: string;
+  display_order: number | null;
+  cover_image: string | null;
+  project_images: Array<{
+    id: number;
+    url: string;
+    alt: string | null;
+    display_order: number | null;
+  }>;
+};
+
 export async function getConsolidatedHomepage(): Promise<HomepageContent> {
   const supabase = await createClient();
   const [{ data: row }, { data: categories }, { data: projects }] = await Promise.all([
@@ -8,7 +21,7 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
     supabase.from("categories").select("id,slug,name,description,image,display_order,published").eq("published", true).order("display_order").order("id"),
     supabase
       .from("projects")
-      .select("id,title,display_order,project_images(id,url,alt,display_order)")
+      .select("id,title,display_order,cover_image,project_images(id,url,alt,display_order)")
       .eq("published", true)
       .order("display_order")
       .order("id"),
@@ -20,7 +33,11 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
     ...value,
     hero: { ...DEFAULT_HOMEPAGE.hero, ...(value.hero ?? {}) },
     areas: { ...DEFAULT_HOMEPAGE.areas, ...(value.areas ?? {}) },
-    gallery: { ...DEFAULT_HOMEPAGE.gallery, ...(value.gallery ?? {}), images: Array.isArray(value.gallery?.images) ? value.gallery.images : DEFAULT_HOMEPAGE.gallery.images },
+    gallery: {
+      ...DEFAULT_HOMEPAGE.gallery,
+      ...(value.gallery ?? {}),
+      images: Array.isArray(value.gallery?.images) ? value.gallery.images : DEFAULT_HOMEPAGE.gallery.images,
+    },
     portfolio: { ...DEFAULT_HOMEPAGE.portfolio, ...(value.portfolio ?? {}) },
     method: { ...DEFAULT_HOMEPAGE.method, ...(value.method ?? {}) },
     finalCta: { ...DEFAULT_HOMEPAGE.finalCta, ...(value.finalCta ?? {}) },
@@ -35,25 +52,49 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
     image: category.image ?? "",
   }));
 
-  const projectTitles = new Map((projects ?? []).map((project) => [project.id, project.title]));
-  const albumImages: GalleryImage[] = (projects ?? []).flatMap((project) =>
-    (project.project_images ?? [])
-      .slice()
-      .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0) || a.id - b.id)
-      .map((item) => ({
-        image: item.url,
-        alt: item.alt || projectTitles.get(project.id) || "Obra Nascimento Reformas",
-        label: projectTitles.get(project.id) || "",
-      }))
-  );
+  const albumImages = buildProjectGallery((projects ?? []) as ProjectRow[]);
+  const seen = new Set<string>();
+  const configuredImages = content.gallery.images.filter((item) => {
+    const key = normalizeImageUrl(item.image);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
-  const existing = new Set(content.gallery.images.map((item) => item.image));
-  content.gallery.images = [
-    ...content.gallery.images,
-    ...albumImages.filter((item) => item.image && !existing.has(item.image)),
-  ];
+  content.gallery.images = [...configuredImages, ...albumImages.filter((item) => {
+    const key = normalizeImageUrl(item.image);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  })];
 
   return content;
+}
+
+function buildProjectGallery(projects: ProjectRow[]): GalleryImage[] {
+  return projects.flatMap((project) => {
+    const images = (project.project_images ?? [])
+      .filter((item) => normalizeImageUrl(item.url))
+      .slice()
+      .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0) || a.id - b.id);
+
+    if (images.length > 0) {
+      return images.map((item) => ({
+        image: item.url.trim(),
+        alt: item.alt?.trim() || project.title || "Obra Nascimento Reformas",
+        label: project.title || "",
+      }));
+    }
+
+    const cover = normalizeImageUrl(project.cover_image);
+    return cover
+      ? [{ image: cover, alt: project.title || "Obra Nascimento Reformas", label: project.title || "" }]
+      : [];
+  });
+}
+
+function normalizeImageUrl(value: string | null | undefined): string {
+  return typeof value === "string" ? value.trim() : "";
 }
 
 function parseValue(value: unknown): Partial<HomepageContent> {
