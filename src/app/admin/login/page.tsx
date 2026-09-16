@@ -30,13 +30,9 @@ export default function AdminLoginPage() {
         return;
       }
 
-      const { data: admin, error: adminError } = await supabase
-        .from("admins")
-        .select("user_id")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
 
-      if (adminError || !admin) {
+      if (adminError || !isAdmin) {
         await supabase.auth.signOut();
         setError("Usuário autenticado, mas sem permissão administrativa.");
         return;
