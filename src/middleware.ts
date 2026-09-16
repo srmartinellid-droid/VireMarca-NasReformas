@@ -18,9 +18,7 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = pathname.startsWith("/admin");
   const isLoginRoute = pathname === "/admin/login";
   if (isAdminRoute && !isLoginRoute) {
-    if (userError || !data.user) {
-      const loginUrl = request.nextUrl.clone(); loginUrl.pathname = "/admin/login"; loginUrl.searchParams.set("next", pathname); return NextResponse.redirect(loginUrl);
-    }
+    if (userError || !data.user) { const loginUrl = request.nextUrl.clone(); loginUrl.pathname = "/admin/login"; loginUrl.searchParams.set("next", pathname); return NextResponse.redirect(loginUrl); }
     const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
     if (adminError || !isAdmin) { const loginUrl = new URL("/admin/login", request.url); loginUrl.searchParams.set("error", "unauthorized"); return NextResponse.redirect(loginUrl); }
   }
