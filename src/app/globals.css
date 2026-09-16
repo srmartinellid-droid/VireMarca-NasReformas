@@ -8,3 +8,6 @@ body { background-color: var(--color-background); color: var(--color-foreground)
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
 .text-balance { text-wrap: balance; }
 .bg-grid-subtle { background-image: linear-gradient(to right, var(--color-stone-200) 1px, transparent 1px), linear-gradient(to bottom, var(--color-stone-200) 1px, transparent 1px); background-size: 56px 56px; }
+#galeria [style*="--gallery-card-width"] { --gallery-card-width: calc(100vw - 40px) !important; }
+@media (min-width: 640px) { #galeria [style*="--gallery-card-width"] { --gallery-card-width: 65vw !important; } }
+@media (min-width: 1024px) { #galeria [style*="--gallery-card-width"] { --gallery-card-width: 380px !important; } }
