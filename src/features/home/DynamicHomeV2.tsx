@@ -72,15 +72,71 @@ function ServiceCard({ category, index, accent, orange, wa }: { category: Servic
 }
 
 function GalleryRail({ content, accent, orange }: { content: HomepageContent["gallery"]; accent: string; orange: string }) {
-  const images = useMemo(() => content.images.filter((item) => item.image), [content.images]);
+  const images = useMemo(() => {
+    const seen = new Set<string>();
+    return content.images.filter((item) => {
+      const url = item.image?.trim();
+      if (!url || seen.has(url)) return false;
+      seen.add(url);
+      return true;
+    });
+  }, [content.images]);
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
   const [transition, setTransition] = useState(true);
-  const loop = images.length > 1 ? [...images, ...images] : images;
 
-  useEffect(() => { if (index >= images.length && images.length > 1) { const timer = window.setTimeout(() => { setTransition(false); setIndex(0); requestAnimationFrame(() => setTransition(true)); }, 760); return () => window.clearTimeout(timer); } }, [index, images.length]);
-  useEffect(() => { if (images.length < 2) return; const timer = window.setInterval(() => setIndex((value) => value + 1), Math.max(3500, content.interval || 6200)); return () => window.clearInterval(timer); }, [images.length, content.interval]);
-  const move = (direction: number) => setIndex((value) => direction > 0 ? value + 1 : value === 0 ? Math.max(images.length - 1, 0) : value - 1);
+  useEffect(() => {
+    if (index >= images.length && images.length > 0) {
+      setTransition(false);
+      setIndex(0);
+      requestAnimationFrame(() => setTransition(true));
+    }
+  }, [index, images.length]);
 
-  return <section id="galeria" className="scroll-mt-24 overflow-hidden border-y border-stone-200 bg-[#F7F6F2] px-5 py-20 sm:px-8 lg:px-12 lg:py-28" style={{ ["--gallery-card-width" as string]: "clamp(250px, 30vw, 380px)" }}><div className="mx-auto max-w-[1280px]"><div className="mb-10 flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="mb-4 flex items-center gap-3 text-xs font-bold uppercase tracking-[.24em]" style={{ color: orange }}><span className="h-px w-10" style={{ backgroundColor: orange }} />{content.eyebrow}</p><h2 className="max-w-3xl text-4xl font-semibold leading-[1.02] tracking-[-.05em] text-navy-950 sm:text-6xl">{content.title}</h2><div className="mt-5 h-1 w-16" style={{ backgroundColor: accent }} /><p className="mt-5 max-w-xl text-base leading-7 text-stone-600">Um recorte visual do trabalho, em movimento contínuo. Passe o cursor sobre uma imagem para destacá-la.</p></div><div className="flex items-center gap-2"><button type="button" onClick={() => move(-1)} aria-label="Imagem anterior" className="grid h-11 w-11 place-items-center border border-stone-300 bg-white text-navy-900 transition hover:-translate-y-0.5 hover:bg-navy-900 hover:text-white">←</button><button type="button" onClick={() => move(1)} aria-label="Próxima imagem" className="grid h-11 w-11 place-items-center border bg-white text-navy-900 transition hover:-translate-y-0.5 hover:bg-navy-900 hover:text-white" style={{ borderColor: accent }}>→</button></div></div>{images.length ? <div className="relative -mx-5 overflow-hidden px-5 pb-7 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12"><div className="flex items-center gap-4 py-3" style={{ transform: `translate3d(calc(-${index} * (var(--gallery-card-width) + 1rem)),0,0)`, transition: transition ? "transform 780ms cubic-bezier(.22,.61,.36,1)" : "none" }}>{loop.map((item, i) => { const active = i === index; const raised = active || hovered === i; return <figure key={`${item.image}-${i}`} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className="relative shrink-0 overflow-hidden bg-stone-200 transition-[transform,box-shadow] duration-500" style={{ width: "var(--gallery-card-width)", aspectRatio: "4 / 3", transform: raised ? "scale(1.045)" : "scale(1)", zIndex: raised ? 10 : 1, boxShadow: raised ? `0 18px 45px ${accent}22` : "0 8px 24px rgba(10,28,43,.08)" }}><img src={item.image} alt={item.alt || "Imagem da obra"} className="h-full w-full object-cover" draggable={false} /></figure>; })}</div></div> : <div className="border border-dashed border-stone-300 bg-white p-10 text-sm text-stone-500">A galeria está pronta para receber imagens pelo painel administrativo.</div>}</div></section>;
+  useEffect(() => {
+    if (images.length < 2) return;
+    const timer = window.setInterval(() => {
+      setIndex((value) => value + 1);
+    }, Math.max(3500, content.interval || 6200));
+    return () => window.clearInterval(timer);
+  }, [images.length, content.interval]);
+
+  const move = (direction: number) => {
+    if (images.length < 2) return;
+    if (direction > 0) {
+      setIndex((value) => (value + 1 >= images.length ? 0 : value + 1));
+      return;
+    }
+    setIndex((value) => (value - 1 < 0 ? images.length - 1 : value - 1));
+  };
+
+  return <section id="galeria" className="scroll-mt-24 overflow-hidden border-y border-stone-200 bg-[#F7F6F2] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+    <div className="mx-auto max-w-[1280px]">
+      <div className="mb-10">
+        <div>
+          <p className="mb-4 flex items-center gap-3 text-xs font-bold uppercase tracking-[.24em]" style={{ color: orange }}><span className="h-px w-10" style={{ backgroundColor: orange }} />{content.eyebrow}</p>
+          <h2 className="max-w-3xl text-4xl font-semibold leading-[1.02] tracking-[-.05em] text-navy-950 sm:text-6xl">{content.title}</h2>
+          <div className="mt-5 h-1 w-16" style={{ backgroundColor: accent }} />
+          <p className="mt-5 max-w-xl text-base leading-7 text-stone-600">Um recorte visual do trabalho, em movimento contínuo.</p>
+        </div>
+      </div>
+
+      {images.length ? <div className="relative -mx-5 overflow-hidden px-5 pb-7 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12">
+        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-20">
+          <button type="button" onClick={() => move(-1)} aria-label="Imagem anterior" className="pointer-events-auto absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/70 bg-white/90 text-lg text-navy-900 shadow-lg backdrop-blur-sm transition hover:scale-105 hover:bg-white sm:left-5">←</button>
+          <button type="button" onClick={() => move(1)} aria-label="Próxima imagem" className="pointer-events-auto absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/70 bg-white/90 text-lg text-navy-900 shadow-lg backdrop-blur-sm transition hover:scale-105 hover:bg-white sm:right-5">→</button>
+        </div>
+
+        <div className="flex items-center gap-4 py-3" style={{ transform: `translate3d(calc(-${index} * (var(--gallery-card-width) + 1rem)),0,0)`, transition: transition ? "transform 780ms cubic-bezier(.22,.61,.36,1)" : "none", ['--gallery-card-width' as string]: 'calc(100vw - 40px)' }}>
+          {images.map((item, i) => {
+            const active = i === index;
+            const raised = active || hovered === i;
+            return <figure key={`${item.image}-${i}`} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className="relative shrink-0 overflow-hidden bg-stone-200 transition-[transform,box-shadow] duration-500 sm:[--gallery-card-width:65vw] lg:[--gallery-card-width:380px]" style={{ width: 'var(--gallery-card-width)', aspectRatio: '4 / 3', transform: raised ? 'scale(1.018)' : 'scale(1)', zIndex: raised ? 10 : 1, boxShadow: raised ? `0 18px 45px ${accent}22` : '0 8px 24px rgba(10,28,43,.08)' }}>
+              <img src={item.image} alt={item.alt || 'Imagem da obra'} className="h-full w-full object-cover" draggable={false} />
+            </figure>;
+          })}
+        </div>
+      </div> : <div className="border border-dashed border-stone-300 bg-white p-10 text-sm text-stone-500">A galeria está pronta para receber imagens pelo painel administrativo.</div>}
+    </div>
+  </section>;
 }
