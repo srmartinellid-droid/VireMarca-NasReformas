@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { SITE } from "@/lib/site";
 import { buildWhatsAppUrl } from "@/lib/utils";
@@ -84,6 +84,12 @@ function GalleryRail({ content, accent, orange }: { content: HomepageContent["ga
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
   const [transition, setTransition] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const resumeTimer = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (resumeTimer.current) window.clearTimeout(resumeTimer.current);
+  }, []);
 
   useEffect(() => {
     if (index >= images.length && images.length > 0) {
@@ -94,20 +100,31 @@ function GalleryRail({ content, accent, orange }: { content: HomepageContent["ga
   }, [index, images.length]);
 
   useEffect(() => {
-    if (images.length < 2) return;
-    const timer = window.setInterval(() => {
-      setIndex((value) => value + 1);
+    if (images.length < 2 || paused) return;
+    const timer = window.setTimeout(() => {
+      setIndex((value) => (value + 1 >= images.length ? 0 : value + 1));
     }, Math.max(3500, content.interval || 6200));
-    return () => window.clearInterval(timer);
-  }, [images.length, content.interval]);
+    return () => window.clearTimeout(timer);
+  }, [images.length, content.interval, paused, index]);
+
+  const pauseForSelection = () => {
+    setPaused(true);
+    if (resumeTimer.current) window.clearTimeout(resumeTimer.current);
+    resumeTimer.current = window.setTimeout(() => setPaused(false), 10000);
+  };
 
   const move = (direction: number) => {
     if (images.length < 2) return;
-    if (direction > 0) {
-      setIndex((value) => (value + 1 >= images.length ? 0 : value + 1));
-      return;
-    }
-    setIndex((value) => (value - 1 < 0 ? images.length - 1 : value - 1));
+    pauseForSelection();
+    setIndex((value) => {
+      if (direction > 0) return value + 1 >= images.length ? 0 : value + 1;
+      return value - 1 < 0 ? images.length - 1 : value - 1;
+    });
+  };
+
+  const selectImage = (selectedIndex: number) => {
+    pauseForSelection();
+    setIndex(selectedIndex);
   };
 
   return <section id="galeria" className="scroll-mt-24 overflow-hidden border-y border-stone-200 bg-[#F7F6F2] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
@@ -127,11 +144,11 @@ function GalleryRail({ content, accent, orange }: { content: HomepageContent["ga
           <button type="button" onClick={() => move(1)} aria-label="Próxima imagem" className="pointer-events-auto absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/70 bg-white/90 text-lg text-navy-900 shadow-lg backdrop-blur-sm transition hover:scale-105 hover:bg-white sm:right-5">→</button>
         </div>
 
-        <div className="flex items-center gap-4 py-3" style={{ transform: `translate3d(calc(-${index} * (var(--gallery-card-width) + 1rem)),0,0)`, transition: transition ? "transform 780ms cubic-bezier(.22,.61,.36,1)" : "none", ['--gallery-card-width' as string]: 'calc(100vw - 40px)' }}>
+        <div className="flex items-center gap-4 py-3" style={{ transform: `translate3d(calc(-${index} * (var(--gallery-card-width) + 1rem)),0,0)`, transition: transition ? "transform 1400ms cubic-bezier(.22,.61,.36,1)" : "none", ['--gallery-card-width' as string]: 'calc(100vw - 40px)' }}>
           {images.map((item, i) => {
             const active = i === index;
             const raised = active || hovered === i;
-            return <figure key={`${item.image}-${i}`} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className="relative shrink-0 overflow-hidden bg-stone-200 transition-[transform,box-shadow] duration-500 sm:[--gallery-card-width:65vw] lg:[--gallery-card-width:380px]" style={{ width: 'var(--gallery-card-width)', aspectRatio: '4 / 3', transform: raised ? 'scale(1.018)' : 'scale(1)', zIndex: raised ? 10 : 1, boxShadow: raised ? `0 18px 45px ${accent}22` : '0 8px 24px rgba(10,28,43,.08)' }}>
+            return <figure key={`${item.image}-${i}`} onClick={() => selectImage(i)} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className="relative shrink-0 cursor-pointer overflow-hidden bg-stone-200 transition-[transform,box-shadow,outline] duration-500 sm:[--gallery-card-width:65vw] lg:[--gallery-card-width:380px]" style={{ width: 'var(--gallery-card-width)', aspectRatio: '4 / 3', transform: raised ? 'scale(1.018)' : 'scale(1)', zIndex: raised ? 10 : 1, boxShadow: raised ? `0 18px 45px ${accent}22` : '0 8px 24px rgba(10,28,43,.08)', outline: active ? `3px solid ${accent}` : '3px solid transparent', outlineOffset: '-3px' }}>
               <img src={item.image} alt={item.alt || 'Imagem da obra'} className="h-full w-full object-cover" draggable={false} />
             </figure>;
           })}
