@@ -1,7 +1,30 @@
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_HOMEPAGE, type HomepageContent } from "@/lib/cms-defaults";
-export type { HomepageContent, HeroSlide } from "@/lib/cms-defaults";
+export type { HomepageContent, HeroSlide, GalleryImage } from "@/lib/cms-defaults";
 export { DEFAULT_HOMEPAGE } from "@/lib/cms-defaults";
-export async function getHomepageContent(): Promise<HomepageContent>{const supabase=await createClient();const {data}=await supabase.from("site_content").select("value").eq("key","homepage").maybeSingle();if(!data?.value||typeof data.value!=="object")return DEFAULT_HOMEPAGE;return mergeHomepage(DEFAULT_HOMEPAGE,data.value as Partial<HomepageContent>)}
-function mergeHomepage(base:HomepageContent,value:Partial<HomepageContent>):HomepageContent{return {...base,...value,hero:{...base.hero,...(value.hero??{}),showGrid:(value.hero as any)?.showGrid ?? base.hero.showGrid},areas:{...base.areas,...(value.areas??{})},portfolio:{...base.portfolio,...(value.portfolio??{})},method:{...base.method,...(value.method??{})},finalCta:{...base.finalCta,...(value.finalCta??{})}}}
-export async function getPublishedProjects(){const supabase=await createClient();const {data}=await supabase.from("projects").select("id,slug,title,description,location,year,cover_image,featured,display_order,categories(name),project_images(id,url,alt,display_order)").eq("published",true).order("featured",{ascending:false}).order("display_order",{ascending:true});return data??[]}
+
+export async function getHomepageContent(): Promise<HomepageContent>{
+  const supabase=await createClient();
+  const {data}=await supabase.from("site_content").select("value").eq("key","homepage").maybeSingle();
+  if(!data?.value||typeof data.value!=="object")return DEFAULT_HOMEPAGE;
+  return mergeHomepage(DEFAULT_HOMEPAGE,data.value as Partial<HomepageContent>);
+}
+
+function mergeHomepage(base:HomepageContent,value:Partial<HomepageContent>):HomepageContent{
+  return {
+    ...base,
+    ...value,
+    hero:{...base.hero,...(value.hero??{}),showGrid:(value.hero as any)?.showGrid ?? base.hero.showGrid},
+    areas:{...base.areas,...(value.areas??{}),categories:Array.isArray(value.areas?.categories)?value.areas.categories:base.areas.categories},
+    gallery:{...base.gallery,...(value.gallery??{}),images:Array.isArray(value.gallery?.images)?value.gallery.images:base.gallery.images},
+    portfolio:{...base.portfolio,...(value.portfolio??{})},
+    method:{...base.method,...(value.method??{})},
+    finalCta:{...base.finalCta,...(value.finalCta??{})}
+  };
+}
+
+export async function getPublishedProjects(){
+  const supabase=await createClient();
+  const {data}=await supabase.from("projects").select("id,slug,title,description,location,year,cover_image,featured,display_order,categories(name),project_images(id,url,alt,display_order)").eq("published",true).order("featured",{ascending:false}).order("display_order",{ascending:true});
+  return data??[];
+}
