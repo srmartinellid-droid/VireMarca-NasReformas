@@ -1,77 +1,10 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
-
-@theme {
-  --color-navy-950: var(--color-navy-950);
-  --color-navy-900: var(--color-navy-900);
-  --color-navy-800: var(--color-navy-800);
-  --color-navy-700: var(--color-navy-700);
-  --color-navy-600: var(--color-navy-600);
-  --color-navy-500: var(--color-navy-500);
-
-  --color-accent-500: var(--color-accent-500);
-  --color-accent-400: var(--color-accent-400);
-  --color-accent-600: var(--color-accent-600);
-  --color-accent-700: var(--color-accent-700);
-
-  --color-stone-50: var(--color-stone-50);
-  --color-stone-100: var(--color-stone-100);
-  --color-stone-200: var(--color-stone-200);
-  --color-stone-300: var(--color-stone-300);
-  --color-stone-400: var(--color-stone-400);
-  --color-stone-500: var(--color-stone-500);
-  --color-stone-600: var(--color-stone-600);
-  --color-stone-700: var(--color-stone-700);
-  --color-stone-800: var(--color-stone-800);
-  --color-stone-900: var(--color-stone-900);
-
-  --font-sans: var(--font-sans);
-  --font-display: var(--font-display);
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-::selection {
-  background-color: var(--color-accent-500);
-  color: white;
-}
-
-/* Focus visible for a11y */
-:focus-visible {
-  outline: 2px solid var(--color-accent-500);
-  outline-offset: 2px;
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Utility for editorial text */
-.text-balance {
-  text-wrap: balance;
-}
-
-/* Subtle grid lines for architectural feel */
-.bg-grid-subtle {
-  background-image: linear-gradient(to right, var(--color-stone-200) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--color-stone-200) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
+@theme { --color-navy-950: var(--color-navy-950); --color-navy-900: var(--color-navy-900); --color-navy-800: var(--color-navy-800); --color-navy-700: var(--color-navy-700); --color-navy-600: var(--color-navy-600); --color-navy-500: var(--color-navy-500); --color-accent-500: var(--color-accent-500); --color-accent-400: var(--color-accent-400); --color-accent-600: var(--color-accent-600); --color-accent-700: var(--color-accent-700); --color-stone-50: var(--color-stone-50); --color-stone-100: var(--color-stone-100); --color-stone-200: var(--color-stone-200); --color-stone-300: var(--color-stone-300); --color-stone-400: var(--color-stone-400); --color-stone-500: var(--color-stone-500); --color-stone-600: var(--color-stone-600); --color-stone-700: var(--color-stone-700); --color-stone-800: var(--color-stone-800); --color-stone-900: var(--color-stone-900); --font-sans: var(--font-sans); --font-display: var(--font-display); }
+html { scroll-behavior: smooth; }
+body { background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+::selection { background-color: var(--color-navy-800); color: white; }
+:focus-visible { outline: 2px solid var(--color-accent-500); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
+.text-balance { text-wrap: balance; }
+.bg-grid-subtle { background-image: linear-gradient(to right, var(--color-stone-200) 1px, transparent 1px), linear-gradient(to bottom, var(--color-stone-200) 1px, transparent 1px); background-size: 56px 56px; }
