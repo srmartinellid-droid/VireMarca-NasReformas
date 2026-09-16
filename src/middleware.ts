@@ -27,15 +27,36 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
   const isLoginRoute = request.nextUrl.pathname === "/admin/login";
 
-  if (isAdminRoute && !isLoginRoute && !data.user) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/admin/login";
-    loginUrl.searchParams.set("next", request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+  if (isAdminRoute && !isLoginRoute) {
+    if (!data.user) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
+      loginUrl.searchParams.set("next", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    const { data: admin } = await supabase
+      .from("admins")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+
+    if (!admin) {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(new URL("/admin/login?error=unauthorized", request.url));
+    }
   }
 
   if (isLoginRoute && data.user) {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    const { data: admin } = await supabase
+      .from("admins")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+
+    if (admin) {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
   }
 
   return response;
