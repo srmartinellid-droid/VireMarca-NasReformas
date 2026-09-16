@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/brand/Logo";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -18,19 +19,30 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const supabase = createClient();
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error || "Credenciais inválidas");
+      if (signInError || !data.user) {
+        setError("Credenciais inválidas");
         return;
       }
 
-      router.push("/admin/dashboard");
+      const { data: admin, error: adminError } = await supabase
+        .from("admins")
+        .select("user_id")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
+      if (adminError || !admin) {
+        await supabase.auth.signOut();
+        setError("Usuário autenticado, mas sem permissão administrativa.");
+        return;
+      }
+
+      router.replace("/admin/dashboard");
       router.refresh();
     } catch {
       setError("Erro de conexão. Tente novamente.");
@@ -91,7 +103,7 @@ export default function AdminLoginPage() {
         </form>
 
         <p className="mt-6 text-xs text-center text-stone-500">
-          Acesso restrito. Credenciais configuradas no banco de dados.
+          Acesso restrito. Autenticação protegida pelo Supabase.
         </p>
       </div>
     </div>
