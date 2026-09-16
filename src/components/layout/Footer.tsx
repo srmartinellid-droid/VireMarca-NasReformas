@@ -11,7 +11,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1280px] px-5 py-14 sm:px-8 lg:px-12 lg:py-16">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-[1.3fr_.7fr_.9fr] md:gap-16">
           <div>
-            <div className="inline-flex bg-white px-3 py-2 ring-1 ring-stone-200">
+            <div className="inline-flex items-center px-0 py-0">
               <Logo variant="dark" size="md" />
             </div>
             <p className="mt-5 max-w-sm text-sm leading-7 text-stone-600">
