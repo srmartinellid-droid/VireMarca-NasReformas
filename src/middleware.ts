@@ -3,40 +3,30 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
+  const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+    cookies: {
+      getAll() { return request.cookies.getAll(); },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
-    }
-  );
+    },
+  });
 
   const { data, error: userError } = await supabase.auth.getUser();
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isLoginRoute = request.nextUrl.pathname === "/admin/login";
+  const pathname = request.nextUrl.pathname;
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isLoginRoute = pathname === "/admin/login";
 
   if (isAdminRoute && !isLoginRoute) {
     if (userError || !data.user) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/admin/login";
-      loginUrl.searchParams.set("next", request.nextUrl.pathname);
+      loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
     }
-
     const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
-
     if (adminError || !isAdmin) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("error", "unauthorized");
@@ -46,14 +36,17 @@ export async function middleware(request: NextRequest) {
 
   if (isLoginRoute && data.user && !userError) {
     const { data: isAdmin } = await supabase.rpc("is_admin");
-    if (isAdmin) {
-      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-    }
+    if (isAdmin) return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 
+  const rewrites: Record<string, string> = { "/": "/home-v2", "/admin/conteudo": "/admin/conteudo-v2", "/admin/categorias": "/admin/categorias-v2" };
+  const target = rewrites[pathname];
+  if (target) {
+    const url = request.nextUrl.clone();
+    url.pathname = target;
+    return NextResponse.rewrite(url, response);
+  }
   return response;
 }
 
-export const config = {
-  matcher: ["/admin/:path*"],
-};
+export const config = { matcher: ["/", "/admin/:path*"] };
