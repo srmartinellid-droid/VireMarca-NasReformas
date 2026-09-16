@@ -24,11 +24,11 @@ export default function AdminDashboardPage() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { label: "Projetos", href: "/admin/projetos", desc: "CRUD completo de portfólio" },
-            { label: "Categorias", href: "/admin/categorias", desc: "Organização da galeria" },
-            { label: "Conteúdo", href: "/admin/conteudo", desc: "Textos e seções do site" },
+            { label: "Projetos", href: "/admin/projetos", desc: "Portfólio e galerias de projetos" },
+            { label: "Categorias", href: "/admin/categorias", desc: "Cards da home + imagens" },
+            { label: "Conteúdo", href: "/admin/conteudo", desc: "Hero, textos e nova galeria" },
             { label: "Leads", href: "/admin/leads", desc: "Mensagens e contatos" },
-            { label: "Configurações", href: "/admin/configuracoes", desc: "WhatsApp, SEO, logo" },
+            { label: "Configurações", href: "/admin/configuracoes", desc: "WhatsApp, SEO, logo e cores" },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="block p-6 rounded-xl bg-white border border-stone-200 hover:border-navy-300 hover:shadow-md transition">
               <h2 className="font-semibold text-navy-900">{item.label}</h2>
