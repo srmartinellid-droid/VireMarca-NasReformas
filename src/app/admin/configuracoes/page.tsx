@@ -1,20 +1,7 @@
+"use client";
 import Link from "next/link";
-
-export default function AdminConfigPage() {
-  return (
-    <div className="min-h-screen bg-stone-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <Link href="/admin/dashboard" className="text-sm text-navy-600 hover:underline mb-4 inline-block">
-          ← Dashboard
-        </Link>
-        <h1 className="text-2xl font-semibold text-navy-900 mb-2">Configurações</h1>
-        <p className="text-stone-600 mb-8">
-          Logo, favicon, WhatsApp, telefone, links sociais, SEO e dados institucionais.
-        </p>
-        <div className="bg-white rounded-xl border border-stone-200 p-8 text-center text-stone-500">
-          WhatsApp atual: <strong>48 9205-6761</strong> (configurável via tabela settings).
-        </div>
-      </div>
-    </div>
-  );
-}
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+const keys=["site_name","whatsapp","region","accent_color","seo_title","seo_description"];
+export default function AdminConfigPage(){const [values,setValues]=useState<Record<string,string>>({site_name:"Nascimento Reformas",whatsapp:"554892056761",region:"Palhoça e Grande Florianópolis - SC",accent_color:"#245675",seo_title:"Nascimento Reformas | Reformas na Grande Florianópolis",seo_description:"Reformas residenciais e comerciais com precisão, planejamento e acabamento."});const [message,setMessage]=useState("");const [saving,setSaving]=useState(false);useEffect(()=>{(async()=>{const s=createClient();const {data}=await s.from("settings").select("key,value").in("key",keys);for(const row of data??[])setValues(v=>({...v,[row.key]:row.value||""}))})()},[]);async function save(){setSaving(true);const s=createClient();for(const key of keys){const {error}=await s.from("settings").upsert({key,value:values[key]||"",updated_at:new Date().toISOString()},{onConflict:"key"});if(error){setMessage(error.message);setSaving(false);return}}setMessage("Configurações salvas.");setSaving(false)}return <div className="min-h-screen bg-stone-100"><header className="border-b border-stone-200 bg-white"><div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5"><div><Link href="/admin/dashboard" className="text-xs uppercase tracking-widest text-stone-500">← Dashboard</Link><h1 className="mt-1 text-xl font-semibold text-navy-950">Configurações</h1></div><button onClick={save} disabled={saving} className="rounded-lg bg-navy-900 px-5 py-2.5 text-sm font-semibold text-white">{saving?"Salvando…":"Salvar"}</button></div></header><main className="mx-auto max-w-5xl px-5 py-8">{message&&<div className="mb-6 bg-white p-3 text-sm text-navy-900">{message}</div>}<section className="bg-white p-6 sm:p-8"><h2 className="text-xl font-semibold text-navy-950">Identidade e contato</h2><div className="mt-6 grid gap-5 sm:grid-cols-2"><Input label="Nome do site" value={values.site_name} set={v=>setValues(x=>({...x,site_name:v}))}/><Input label="WhatsApp (somente números)" value={values.whatsapp} set={v=>setValues(x=>({...x,whatsapp:v.replace(/\D/g,"")}))}/><Input label="Região" value={values.region} set={v=>setValues(x=>({...x,region:v}))}/><Input label="Cor de destaque" type="color" value={values.accent_color} set={v=>setValues(x=>({...x,accent_color:v}))}/></div></section><section className="mt-7 bg-white p-6 sm:p-8"><h2 className="text-xl font-semibold text-navy-950">SEO</h2><div className="mt-6 grid gap-5"><Input label="Título SEO" value={values.seo_title} set={v=>setValues(x=>({...x,seo_title:v}))}/><label><span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-500">Descrição SEO</span><textarea rows={4} value={values.seo_description} onChange={e=>setValues(x=>({...x,seo_description:e.target.value}))} className="w-full rounded-lg border border-stone-300 p-3 text-sm"/></label></div></section><div className="py-8"><button onClick={save} disabled={saving} className="rounded-lg bg-navy-900 px-6 py-3 text-sm font-semibold text-white">{saving?"Salvando…":"Salvar configurações"}</button></div></main></div>}
+function Input({label,value,set,type="text"}:{label:string;value:string;set:(v:string)=>void;type?:string}){return <label><span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-500">{label}</span><input type={type} value={value} onChange={e=>set(e.target.value)} className="h-11 w-full rounded-lg border border-stone-300 px-3 text-sm"/></label>}
