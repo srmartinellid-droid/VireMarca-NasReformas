@@ -23,69 +23,26 @@ export function Footer() {
               Navegação
             </h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/" className="text-stone-200 hover:text-white transition-colors">
-                  Início
-                </Link>
-              </li>
-              <li>
-                <Link href="/#servicos" className="text-stone-200 hover:text-white transition-colors">
-                  Serviços
-                </Link>
-              </li>
-              <li>
-                <Link href="/#portfolio" className="text-stone-200 hover:text-white transition-colors">
-                  Trabalhos
-                </Link>
-              </li>
-              <li>
-                <Link href="/quem-somos" className="text-stone-200 hover:text-white transition-colors">
-                  Quem somos
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacidade" className="text-stone-200 hover:text-white transition-colors">
-                  Política de privacidade
-                </Link>
-              </li>
+              <li><Link href="/" className="text-stone-200 hover:text-white transition-colors">Início</Link></li>
+              <li><Link href="/#servicos" className="text-stone-200 hover:text-white transition-colors">Serviços</Link></li>
+              <li><Link href="/#galeria" className="text-stone-200 hover:text-white transition-colors">Galeria</Link></li>
+              <li><Link href="/quem-somos" className="text-stone-200 hover:text-white transition-colors">Quem somos</Link></li>
+              <li><Link href="/privacidade" className="text-stone-200 hover:text-white transition-colors">Política de privacidade</Link></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-400 mb-4">
-              Contato
-            </h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-400 mb-4">Contato</h3>
             <ul className="space-y-3 text-stone-200">
-              <li>
-                <a
-                  href={buildWhatsAppUrl(SITE.whatsapp)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  WhatsApp: {SITE.whatsappDisplay}
-                </a>
-              </li>
-              <li className="text-sm text-stone-400">
-                {SITE.region}
-              </li>
+              <li><a href={buildWhatsAppUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">WhatsApp: {SITE.whatsappDisplay}</a></li>
+              <li className="text-sm text-stone-400">{SITE.region}</li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-navy-700 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-stone-400">
           <p>© {year} {SITE.name}. Todos os direitos reservados.</p>
-          <p className="text-xs">
-            Um site criado por{" "}
-            <a
-              href="https://viremarca.com.br"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-stone-200"
-            >
-              VireMarca
-            </a>
-          </p>
+          <p className="text-xs">Um site criado por{" "}<a href="https://viremarca.com.br" target="_blank" rel="noopener noreferrer" className="underline hover:text-stone-200">VireMarca</a></p>
         </div>
       </div>
     </footer>
