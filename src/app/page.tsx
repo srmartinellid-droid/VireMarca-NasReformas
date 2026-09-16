@@ -1,16 +1,11 @@
-import { Hero } from "@/features/home/Hero";
-import { Credibility } from "@/features/home/Credibility";
-import { Services } from "@/features/home/Services";
-import { Specialty } from "@/features/home/Specialty";
-import { PortfolioPreview } from "@/features/home/PortfolioPreview";
-import { Process } from "@/features/home/Process";
-import { WhyNascimento } from "@/features/home/WhyNascimento";
-import { Region } from "@/features/home/Region";
-import { CtaFinal } from "@/features/home/CtaFinal";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { DynamicHome } from "@/features/home/DynamicHome";
 import { SITE } from "@/lib/site";
+import { getHomepageContent, getPublishedProjects } from "@/lib/cms";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [content, projects] = await Promise.all([getHomepageContent(), getPublishedProjects()]);
+
   return (
     <>
       <JsonLd
@@ -23,31 +18,14 @@ export default function HomePage() {
           telephone: `+${SITE.whatsapp}`,
           areaServed: {
             "@type": "GeoCircle",
-            geoMidpoint: {
-              "@type": "GeoCoordinates",
-              latitude: -27.645,
-              longitude: -48.668,
-            },
+            geoMidpoint: { "@type": "GeoCoordinates", latitude: -27.645, longitude: -48.668 },
             geoRadius: "40000",
           },
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Palhoça",
-            addressRegion: "SC",
-            addressCountry: "BR",
-          },
+          address: { "@type": "PostalAddress", addressLocality: "Palhoça", addressRegion: "SC", addressCountry: "BR" },
           priceRange: "$$",
         }}
       />
-      <Hero />
-      <Credibility />
-      <Services />
-      <Specialty />
-      <PortfolioPreview />
-      <Process />
-      <WhyNascimento />
-      <Region />
-      <CtaFinal />
+      <DynamicHome content={content} projects={projects} />
     </>
   );
 }
