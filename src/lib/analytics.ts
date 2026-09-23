@@ -1,7 +1,4 @@
-/**
- * Central analytics layer — never call tracking APIs directly from components.
- * Events are typed and can be routed to GA, Plausible, or console in development.
- */
+import { track as vercelTrack } from "@vercel/analytics";
 
 type AnalyticsEvent =
   | { name: "whatsapp_click"; props?: { location?: string; service?: string } }
@@ -21,19 +18,8 @@ declare global {
 
 export function track(event: AnalyticsEvent) {
   if (typeof window === "undefined") return;
-
-  // Development logging
-  if (process.env.NODE_ENV === "development") {
-    console.info("[analytics]", event.name, event.props ?? {});
-  }
-
-  // Google Analytics 4
-  if (typeof window.gtag === "function") {
-    window.gtag("event", event.name, event.props ?? {});
-  }
-
-  // Plausible
-  if (typeof window.plausible === "function") {
-    window.plausible(event.name, { props: event.props as Record<string, string> });
-  }
+  if (process.env.NODE_ENV === "development") console.info("[analytics]", event.name, event.props ?? {});
+  void vercelTrack(event.name, event.props ?? {});
+  if (typeof window.gtag === "function") window.gtag("event", event.name, event.props ?? {});
+  if (typeof window.plausible === "function") window.plausible(event.name, { props: event.props as Record<string, string> });
 }
