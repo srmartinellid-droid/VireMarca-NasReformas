@@ -6,7 +6,7 @@ export type HomepageContent = {
   areas: { eyebrow: string; title: string; highlight: string; description: string; categories: ServiceCategory[] };
   gallery: { eyebrow: string; title: string; images: GalleryImage[]; interval: number };
   portfolio: { eyebrow: string; title: string; description: string; emptyTitle: string; emptyText: string };
-  method: { eyebrow: string; title: string; highlight: string; description: string };
+  method: { eyebrow: string; title: string; highlight: string; description: string; steps: { number: string; title: string; description: string }[] };
   finalCta: { title: string; description: string; button: string };
 };
 
@@ -22,6 +22,6 @@ export const DEFAULT_HOMEPAGE: HomepageContent = {
   ]},
   gallery:{eyebrow:"Galeria",title:"Detalhes que mostram o trabalho",interval:6200,images:[]},
   portfolio:{eyebrow:"Trabalhos",title:"Projetos que falam por si",description:"Uma seleção de obras e intervenções realizadas pela Nascimento Reformas.",emptyTitle:"Galeria em construção",emptyText:"Publique seus projetos reais pelo painel administrativo e eles aparecerão aqui automaticamente."},
-  method:{eyebrow:"Nosso método",title:"Clareza do início à entrega",highlight:"Segurança em cada decisão",description:"Um processo contínuo, com planejamento claro, comunicação próxima e atenção ao acabamento."},
+  method:{eyebrow:"Nosso método",title:"Clareza do início à entrega",highlight:"Segurança em cada decisão",description:"Um processo contínuo, com planejamento claro, comunicação próxima e atenção ao acabamento.",steps:[{number:"01",title:"Visita e levantamento",description:"Entendemos o ambiente e levantamos o que será necessário para a reforma."},{number:"02",title:"Orçamento detalhado",description:"Organizamos o escopo e os itens previstos para a execução."},{number:"03",title:"Execução",description:"Realizamos os serviços com cuidado, organização e atenção ao imóvel."},{number:"04",title:"Entrega e acabamento",description:"Conferimos os detalhes finais e entregamos o trabalho."}]},
   finalCta:{title:"Vamos conversar sobre sua obra?",description:"Conte o que você pretende construir ou reformar e fale diretamente com a equipe.",button:"Solicitar orçamento"}
 };
