@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:info && next build",
+    "build:info": "node scripts/generate-build-info.mjs",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.116.0",
+    "@vercel/analytics": "latest",
     "clsx": "2.1.1",
     "framer-motion": "13.3.0",
     "lucide-react": "0.475.0",
