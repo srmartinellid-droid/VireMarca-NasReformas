@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { SITE } from "@/lib/site";
+import { SITE, formatWhatsappDisplay, resolveWhatsapp } from "@/lib/site";
 import { buildWhatsAppUrl } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 
 export function CtaFinal() {
+  const whatsapp = resolveWhatsapp(SITE.whatsapp);
   return (
     <section id="contato" className="py-24 md:py-32 bg-navy-900 text-white">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 text-center">
@@ -25,7 +26,7 @@ export function CtaFinal() {
           <div className="mt-10">
             <a
               href={buildWhatsAppUrl(
-                SITE.whatsapp,
+                whatsapp,
                 "Olá, gostaria de solicitar um orçamento para uma reforma."
               )}
               target="_blank"
@@ -33,12 +34,12 @@ export function CtaFinal() {
               onClick={() =>
                 track({
                   name: "whatsapp_click",
-                  props: { location: "cta-final" },
+                  props: { location: "cta" },
                 })
               }
             >
               <Button variant="accent" size="lg">
-                Falar no WhatsApp — {SITE.whatsappDisplay}
+                Falar no WhatsApp — {formatWhatsappDisplay(whatsapp)}
               </Button>
             </a>
           </div>

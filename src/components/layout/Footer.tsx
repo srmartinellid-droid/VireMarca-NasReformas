@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
-import { SITE } from "@/lib/site";
+import { SITE, formatWhatsappDisplay, resolveWhatsapp } from "@/lib/site";
 import { buildWhatsAppUrl } from "@/lib/utils";
 
 export function Footer({ whatsapp }: { whatsapp: string }) {
@@ -33,15 +33,14 @@ export function Footer({ whatsapp }: { whatsapp: string }) {
           <div>
             <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[.2em] text-stone-500">Contato</h3>
             <ul className="space-y-3 text-sm">
-              <li><a href={buildWhatsAppUrl(whatsapp)} target="_blank" rel="noopener noreferrer" className="font-medium text-navy-900 transition-colors hover:text-accent-600">WhatsApp: {SITE.whatsappDisplay}</a></li>
+              <li><a href={buildWhatsAppUrl(whatsapp)} target="_blank" rel="noopener noreferrer" className="font-medium text-navy-900 transition-colors hover:text-accent-600">WhatsApp: {formatWhatsappDisplay(resolveWhatsapp(whatsapp))}</a></li>
               <li className="text-stone-500">{SITE.region}</li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-stone-300 pt-6 text-xs text-stone-500 sm:flex-row sm:items-center">
-          <p>© {year} {SITE.name}. Todos os direitos reservados.</p>
-          <p>Um site criado por <a href="https://viremarca.com.br" target="_blank" rel="noopener noreferrer" className="font-semibold text-navy-800 underline decoration-stone-300 underline-offset-4 hover:text-accent-600">VireMarca</a></p>
+          <p>© {year} {SITE.name} · Todos os direitos reservados. · Desenvolvido por <a href="https://viremarca.com.br" target="_blank" rel="noopener noreferrer" className="font-semibold text-navy-800 underline decoration-stone-300 underline-offset-4 hover:text-accent-600">VireMarca</a></p>
         </div>
       </div>
     </footer>

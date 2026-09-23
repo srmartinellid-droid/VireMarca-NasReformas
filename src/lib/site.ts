@@ -14,10 +14,20 @@ export const SITE = {
     "15 anos de experiência em reformas residenciais na Grande Florianópolis. Drywall, gesso, hidráulica e reformas completas para residências de médio e alto padrão.",
   region: "Palhoça e Grande Florianópolis — SC",
   whatsapp: "5548992056761",
-  whatsappDisplay: "(48) 99205-6761",
   yearsExperience: 15,
   url: PRODUCTION_URL,
 } as const;
+
+export function resolveWhatsapp(dbValue?: string | null): string {
+  return typeof dbValue === "string" && /^55\d{2}9\d{8}$/.test(dbValue)
+    ? dbValue
+    : SITE.whatsapp;
+}
+
+export function formatWhatsappDisplay(phone: string): string {
+  const resolved = resolveWhatsapp(phone);
+  return `(${resolved.slice(2, 4)}) ${resolved.slice(5, 10)}-${resolved.slice(10)}`;
+}
 
 export const SERVICES = [
   { slug: "reformas-residenciais", title: "Reformas residenciais", short: "Intervenções planejadas em residências de médio e alto padrão.", description: "Do detalhe à reforma completa. Planejamento, execução e acabamento com atenção ao resultado final." },

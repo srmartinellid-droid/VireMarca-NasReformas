@@ -1,7 +1,6 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
-import { SITE } from "@/lib/site";
+import { SiWhatsapp } from "react-icons/si";
 import { buildWhatsAppUrl } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 
@@ -22,7 +21,7 @@ export function FloatingWhatsApp({ whatsapp }: { whatsapp: string }) {
       className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
       aria-label="Conversar no WhatsApp"
     >
-      <MessageCircle size={28} fill="currentColor" />
+      <SiWhatsapp size={28} />
     </a>
   );
 }

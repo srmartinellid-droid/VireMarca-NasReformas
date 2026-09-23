@@ -5,7 +5,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
-import { SITE } from "@/lib/site";
+import { SITE, resolveWhatsapp } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const supabase = await createClient();
   const { data } = await supabase.from("settings").select("key,value").in("key", ["logo_url", "wordmark_url", "whatsapp"]);
   const settings = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
-  const whatsapp = typeof settings.whatsapp === "string" && settings.whatsapp.trim() ? settings.whatsapp.trim() : SITE.whatsapp;
+  const whatsapp = resolveWhatsapp(settings.whatsapp);
 
   return (
     <html lang="pt-BR" className={inter.variable}>
