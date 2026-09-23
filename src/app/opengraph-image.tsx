@@ -9,7 +9,7 @@ export default function OpenGraphImage() {
   return new ImageResponse(
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "72px", background: "#0B3A64", color: "white", fontFamily: "Arial" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
-        <img src="https://www.nascimentoreformas.com.br/logo.png" width="112" height="112" style={{ objectFit: "contain" }} />
+        <img src="https://whgznodgurkuskmsejos.supabase.co/storage/v1/object/public/site-media/brand/2c5157fa-8537-430e-b192-04ee916f7c30.png" width="112" height="112" style={{ objectFit: "contain" }} />
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 48, fontWeight: 800 }}>Nascimento Reformas</div>
           <div style={{ fontSize: 24, opacity: 0.78 }}>Palhoça e Grande Florianópolis · SC</div>
