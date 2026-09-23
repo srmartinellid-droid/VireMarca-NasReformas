@@ -28,6 +28,8 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
   ]);
 
   const value = parseValue(row?.value);
+  const { data: whatsappSetting } = await supabase.from("settings").select("value").eq("key", "whatsapp").maybeSingle();
+  const whatsapp = typeof whatsappSetting?.value === "string" && whatsappSetting.value.trim() ? whatsappSetting.value.trim() : undefined;
   const content: HomepageContent = {
     ...DEFAULT_HOMEPAGE,
     ...value,
@@ -39,7 +41,8 @@ export async function getConsolidatedHomepage(): Promise<HomepageContent> {
       images: Array.isArray(value.gallery?.images) ? value.gallery.images : DEFAULT_HOMEPAGE.gallery.images,
     },
     portfolio: { ...DEFAULT_HOMEPAGE.portfolio, ...(value.portfolio ?? {}) },
-    method: { ...DEFAULT_HOMEPAGE.method, ...(value.method ?? {}) },
+    method: { ...DEFAULT_HOMEPAGE.method, ...(value.method ?? {}), steps: normalizeMethodSteps(value.method?.steps) },
+    whatsapp,
     finalCta: { ...DEFAULT_HOMEPAGE.finalCta, ...(value.finalCta ?? {}) },
   };
 
@@ -109,4 +112,17 @@ function parseValue(value: unknown): Partial<HomepageContent> {
     }
   }
   return {};
+}
+
+function normalizeMethodSteps(value: unknown): HomepageContent["method"]["steps"] {
+  if (!Array.isArray(value)) return DEFAULT_HOMEPAGE.method.steps;
+  const steps = value
+    .filter((step): step is { number?: unknown; title?: unknown; description?: unknown } => !!step && typeof step === "object")
+    .map((step, index) => ({
+      number: typeof step.number === "string" && step.number.trim() ? step.number.trim() : String(index + 1).padStart(2, "0"),
+      title: typeof step.title === "string" ? step.title.trim() : "",
+      description: typeof step.description === "string" ? step.description.trim() : "",
+    }))
+    .filter((step) => step.title && step.description);
+  return steps.length ? steps : DEFAULT_HOMEPAGE.method.steps;
 }

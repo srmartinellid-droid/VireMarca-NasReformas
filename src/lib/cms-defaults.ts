@@ -2,6 +2,7 @@ export type HeroSlide = { image: string; alt?: string; label?: string };
 export type GalleryImage = { image: string; alt?: string; label?: string };
 export type ServiceCategory = { id?: number; slug?: string; title: string; description: string; image: string; number?: string };
 export type HomepageContent = {
+  whatsapp?: string;
   hero: { eyebrow: string; title: string; highlight: string; description: string; panelTitle: string; panelText: string; primaryLabel: string; secondaryLabel: string; heroInterval: number; heroOverlay: number; accentColor: string; showGrid: boolean; images: HeroSlide[] };
   areas: { eyebrow: string; title: string; highlight: string; description: string; categories: ServiceCategory[] };
   gallery: { eyebrow: string; title: string; images: GalleryImage[]; interval: number };

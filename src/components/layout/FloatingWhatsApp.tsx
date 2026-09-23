@@ -5,7 +5,7 @@ import { SITE } from "@/lib/site";
 import { buildWhatsAppUrl } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 
-export function FloatingWhatsApp() {
+export function FloatingWhatsApp({ whatsapp }: { whatsapp: string }) {
   const handleClick = () => {
     track({ name: "whatsapp_click", props: { location: "floating" } });
   };
@@ -13,7 +13,7 @@ export function FloatingWhatsApp() {
   return (
     <a
       href={buildWhatsAppUrl(
-        SITE.whatsapp,
+        whatsapp,
         "Olá, gostaria de solicitar um orçamento para uma reforma."
       )}
       target="_blank"
