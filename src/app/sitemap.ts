@@ -4,23 +4,8 @@ import { SITE } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = SITE.url;
   return [
-    {
-      url: base,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${base}/quem-somos`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${base}/privacidade`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
+    { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
+    { url: `${base}/quem-somos`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/privacidade`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
   ];
 }
