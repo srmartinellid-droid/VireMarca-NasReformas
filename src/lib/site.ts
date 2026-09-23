@@ -4,6 +4,7 @@
  * These are the defaults and structural values.
  */
 
+// Production canonical URL. Keep this independent from preview deployment hostnames.
 const PRODUCTION_URL = "https://www.nascimentoreformas.com.br";
 
 export const SITE = {
