@@ -47,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main className="flex-1">{children}</main>
         <Footer />
         <FloatingWhatsApp />
-        <Analytics beforeSend={(event) => event.url.includes("/admin") ? null : event} />
+        <Analytics />
       </body>
     </html>
   );
