@@ -1,75 +1,98 @@
 # RELEASE GATE — Nascimento Reformas
 
 **Cliente:** Nascimento Reformas  
-**Repositório:** (criar no GitHub — 1 repo por cliente)  
-**Banco:** Neon PostgreSQL (próprio, isolado)  
+**Repositório:** `srmartinellid-droid/VireMarca-NasReformas`  
+**Branch de publicação:** `main`  
+**Banco:** Supabase (projeto próprio e isolado)  
 **Deploy:** Vercel (projeto próprio)  
-**Regra VireMarca:** `main` é a fonte de verdade da publicação.
+**Domínio oficial:** https://www.nascimentoreformas.com.br
 
----
+## Checklist obrigatório
 
-## Checklist obrigatório antes de declarar “pronto”
-
-| # | Critério | Status | Como validar |
-|---|----------|--------|--------------|
-| 1 | Código em `main` | ☐ | `git log -1` e branch atual |
-| 2 | Build passa | ☐ | `npm run build` sem erros |
-| 3 | Banco configurado | ☐ | `DATABASE_URL` na Vercel + `db:push` |
-| 4 | Autenticação funciona | ☐ | Login em `/admin/login` com usuário seed |
-| 5 | Upload de imagens | ☐ | Vercel Blob token configurado + teste de upload |
-| 6 | CRUD de projetos | ☐ | Criar, editar, publicar, despublicar projeto |
-| 7 | WhatsApp funciona | ☐ | CTAs abrem `wa.me/554892056761` com mensagem |
-| 8 | Formulário / leads | ☐ | (quando implementado) grava no banco |
-| 9 | Produção responde | ☐ | URL pública carrega e não é 404/500 |
-| 10 | Commit publicado = esperado | ☐ | Vercel deployment bate com SHA do `main` |
-
----
+| # | Critério | Como validar |
+|---|---|---|
+| 1 | Código em `main` | commit publicado corresponde ao SHA de `main` |
+| 2 | TypeScript | `npx tsc --noEmit` |
+| 3 | Build | `npm run build` |
+| 4 | Supabase | projeto `whgznodgurkuskmsejos` responde e conteúdo publicado carrega |
+| 5 | Autenticação | `/admin/login` e rotas protegidas |
+| 6 | Upload / CMS | imagens e conteúdo publicados pelo painel |
+| 7 | WhatsApp | todos os CTAs usam a fonte única e abrem o número confirmado |
+| 8 | SEO | canonical, sitemap, robots e JSON-LD usam o domínio oficial |
+| 9 | Compartilhamento | Open Graph image responde 200 |
+| 10 | Build identity | `/build-info.json` corresponde ao SHA publicado |
+| 11 | Analytics | Vercel Web Analytics ativo; clique de WhatsApp medido por origem |
+| 12 | Produção | domínio público responde sem 404/500 |
+| 13 | Domínio legado | `viremarca-nasreformas.vercel.app` redireciona para o domínio oficial |
 
 ## Identidade do build
 
-Incluir no README ou no footer do admin:
+O build gera automaticamente:
+
+```json
+{
+  "sha": "<VERCEL_GIT_COMMIT_SHA>",
+  "branch": "<VERCEL_GIT_COMMIT_REF>",
+  "date": "<ISO-8601>",
+  "environment": "<VERCEL_ENV>"
+}
+```
+
+Endpoint:
 
 ```
-Build: [SHA curto]
-Branch: main
-Deploy: [data]
+/build-info.json
 ```
 
----
+## Infraestrutura
+
+Variáveis públicas esperadas:
+
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_WHATSAPP`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+O domínio canônico do código é `https://www.nascimentoreformas.com.br`.
+
+Não colocar secrets no código ou no Git.
 
 ## Fluxo de release
 
 ```
-alteração → teste local → commit → push main → Vercel build → deployment → validação em produção
+alteração
+→ validação
+→ commit
+→ push main
+→ Vercel Production
+→ Release Gate
+→ validação pública
 ```
 
 Nunca editar produção manualmente.  
-Nunca misturar credenciais de outro cliente.  
-Nunca compartilhar o banco Neon com outro site.
+Nunca misturar credenciais de outro cliente.
 
----
+## Pendências de conteúdo
 
-## Variáveis de ambiente (Vercel)
+Não publicar dados comerciais inventados.
 
-- `DATABASE_URL` — Neon connection string (pooled)
-- `NEXTAUTH_SECRET` / session secret
-- `NEXTAUTH_URL` — URL de produção
-- `BLOB_READ_WRITE_TOKEN` — Vercel Blob
-- `NEXT_PUBLIC_SITE_URL`
-- `NEXT_PUBLIC_WHATSAPP=554892056761`
-- `ADMIN_EMAIL` / `ADMIN_PASSWORD` (apenas para seed inicial)
+Atualmente dependem de validação do cliente:
 
----
+- WhatsApp correto
+- CNPJ
+- e-mail
+- Instagram
+- texto da seção Hidráulica
+- 4 etapas finais do método, caso o cliente queira um processo específico
 
-## Pós-deploy
+## Preservar
 
-1. Confirmar homepage
-2. Confirmar `/quem-somos`
-3. Confirmar botão flutuante WhatsApp
-4. Confirmar `/admin/login`
-5. Confirmar SEO (title, OG, JSON-LD)
-6. Confirmar mobile
-
----
-
-**Assinatura VireMarca:** Um site criado por VireMarca — no footer.
+- identidade visual azul-marinho + laranja
+- HTTPS
+- um H1 por página
+- `lang="pt-BR"`
+- acessibilidade existente
+- responsividade
+- zoom
+- página 404
+- estrutura de navegação
