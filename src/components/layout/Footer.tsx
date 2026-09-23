@@ -33,7 +33,7 @@ export function Footer({ whatsapp }: { whatsapp: string }) {
           <div>
             <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[.2em] text-stone-500">Contato</h3>
             <ul className="space-y-3 text-sm">
-              <li><a href={buildWhatsAppUrl(whatsapp)} target="_blank" rel="noopener noreferrer" className="font-medium text-navy-900 transition-colors hover:text-accent-600">WhatsApp: {whatsappDisplay}</a></li>
+              <li><a href={buildWhatsAppUrl(whatsapp)} target="_blank" rel="noopener noreferrer" className="font-medium text-navy-900 transition-colors hover:text-accent-600">WhatsApp: {SITE.whatsappDisplay}</a></li>
               <li className="text-stone-500">{SITE.region}</li>
             </ul>
           </div>
