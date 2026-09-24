@@ -3,7 +3,7 @@ import { Logo } from "@/components/brand/Logo";
 import { SITE, formatWhatsappDisplay, resolveWhatsapp } from "@/lib/site";
 import { buildWhatsAppUrl } from "@/lib/utils";
 
-export function Footer({ whatsapp }: { whatsapp: string }) {
+export function Footer({ whatsapp, email, instagram, cnpj }: { whatsapp: string; email?: string; instagram?: string; cnpj?: string }) {
   const year = new Date().getFullYear();
 
   return (
@@ -26,7 +26,7 @@ export function Footer({ whatsapp }: { whatsapp: string }) {
               <li><Link href="/#servicos" className="text-navy-900 transition-colors hover:text-accent-600">Serviços</Link></li>
               <li><Link href="/#galeria" className="text-navy-900 transition-colors hover:text-accent-600">Galeria</Link></li>
               <li><Link href="/quem-somos" className="text-navy-900 transition-colors hover:text-accent-600">Quem somos</Link></li>
-              <li><Link href="/privacidade" className="text-stone-500 transition-colors hover:text-navy-900">Política de privacidade</Link></li>
+              <li><Link href="/privacidade" className="text-stone-500 transition-colors hover:text-navy-900">Privacidade</Link></li>
             </ul>
           </div>
 
@@ -34,7 +34,7 @@ export function Footer({ whatsapp }: { whatsapp: string }) {
             <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[.2em] text-stone-500">Contato</h3>
             <ul className="space-y-3 text-sm">
               <li><a href={buildWhatsAppUrl(whatsapp)} target="_blank" rel="noopener noreferrer" className="font-medium text-navy-900 transition-colors hover:text-accent-600">WhatsApp: {formatWhatsappDisplay(resolveWhatsapp(whatsapp))}</a></li>
-              <li className="text-stone-500">{SITE.region}</li>
+              <li className="text-stone-500">{SITE.region}</li>\n              {email && <li><a href={`mailto:${email}`} className="text-stone-500 transition-colors hover:text-navy-900">{email}</a></li>}\n              {instagram && <li><a href={instagram} target="_blank" rel="noopener noreferrer" className="text-stone-500 transition-colors hover:text-navy-900">Instagram</a></li>}\n              {cnpj && <li className="text-stone-500">CNPJ: {cnpj}</li>}
             </ul>
           </div>
         </div>

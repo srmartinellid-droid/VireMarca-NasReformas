@@ -49,7 +49,7 @@ export const viewport: Viewport = { themeColor: "#0B3A64", width: "device-width"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data } = await supabase.from("settings").select("key,value").in("key", ["logo_url", "wordmark_url", "whatsapp"]);
+  const { data } = await supabase.from("settings").select("key,value").in("key", ["logo_url", "wordmark_url", "whatsapp", "email", "instagram", "cnpj"]);
   const settings = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
   const whatsapp = resolveWhatsapp(settings.whatsapp);
 
@@ -58,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen flex flex-col antialiased">
         <Header initialLogo={settings.logo_url || "/logo.png"} initialWordmark={settings.wordmark_url || ""} whatsapp={whatsapp} />
         <main className="flex-1">{children}</main>
-        <Footer whatsapp={whatsapp} />
+        <Footer whatsapp={whatsapp} email={settings.email} instagram={settings.instagram} cnpj={settings.cnpj} />
         <FloatingWhatsApp whatsapp={whatsapp} />
         <Analytics />
       </body>
