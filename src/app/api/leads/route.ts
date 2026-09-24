@@ -1,0 +1,10 @@
+import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { SERVICES } from "@/lib/site";
+const serviceNames=SERVICES.map((service)=>service.title);
+const schema=z.object({name:z.string().trim().min(2).max(120),phone:z.string().trim().min(10).max(20),service:z.string().trim().min(2).max(100).refine((value)=>serviceNames.includes(value),"Serviço inválido"),message:z.string().trim().max(1000).optional().default(""),source:z.string().trim().min(1).max(40).default("cta"),website:z.string().max(0).optional().default("")});
+const attempts=new Map<string,number>(); const WINDOW_MS=20000;
+function validBrazilianPhone(value:string){const digits=value.replace(/\D/g,"");const local=digits.startsWith("55")?digits.slice(2):digits;return /^\d{10,11}$/.test(local)&&(!local.startsWith("9")||local.length===11)}
+export async function POST(request:Request){const body=await request.json().catch(()=>null);const parsed=schema.safeParse(body);if(!parsed.success||!validBrazilianPhone(parsed.data?.phone??""))return NextResponse.json({ok:false,error:"Confira os dados informados."},{status:400});if(parsed.data.website)return NextResponse.json({ok:true,spam:true});const h=await headers();const ip=(h.get("x-forwarded-for")??h.get("x-real-ip")??"unknown").split(",")[0].trim();const now=Date.now();const last=attempts.get(ip)??0;if(now-last<WINDOW_MS)return NextResponse.json({ok:false,error:"Aguarde alguns segundos antes de enviar novamente."},{status:429});attempts.set(ip,now);const supabase=await createClient();const digits=parsed.data.phone.replace(/\D/g,"");const phone=digits.startsWith("55")?digits.slice(2):digits;const{error}=await supabase.from("leads").insert({name:parsed.data.name,phone,email:null,message:parsed.data.message||null,source:parsed.data.source,service:parsed.data.service,status:"novo"});if(error)return NextResponse.json({ok:false,error:"Não foi possível registrar o pedido."},{status:500});return NextResponse.json({ok:true})}

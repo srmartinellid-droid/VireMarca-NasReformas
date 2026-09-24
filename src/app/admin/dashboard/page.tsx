@@ -1,42 +1,4 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
-
-export default function AdminDashboardPage() {
-  return (
-    <div className="min-h-screen bg-stone-100">
-      <header className="bg-white border-b border-stone-200">
-        <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-          <Logo size="sm" href="/admin/dashboard" />
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/admin/projetos" className="text-navy-800 hover:underline">Projetos</Link>
-            <Link href="/admin/categorias" className="text-navy-800 hover:underline">Categorias</Link>
-            <Link href="/admin/conteudo" className="text-navy-800 hover:underline">Conteúdo</Link>
-            <Link href="/admin/leads" className="text-navy-800 hover:underline">Leads</Link>
-            <Link href="/admin/configuracoes" className="text-navy-800 hover:underline">Configurações</Link>
-            <Link href="/" className="text-stone-500 hover:underline">Ver site</Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-4 py-10">
-        <h1 className="text-2xl font-semibold text-navy-900 mb-2">Dashboard</h1>
-        <p className="text-stone-600 mb-10">Painel administrativo da Nascimento Reformas.</p>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { label: "Projetos", href: "/admin/projetos", desc: "Portfólio e galerias de projetos" },
-            { label: "Categorias", href: "/admin/categorias", desc: "Cards da home + imagens" },
-            { label: "Conteúdo", href: "/admin/conteudo", desc: "Hero, textos e nova galeria" },
-            { label: "Leads", href: "/admin/leads", desc: "Mensagens e contatos" },
-            { label: "Configurações", href: "/admin/configuracoes", desc: "WhatsApp, SEO, logo e cores" },
-          ].map((item) => (
-            <Link key={item.href} href={item.href} className="block p-6 rounded-xl bg-white border border-stone-200 hover:border-navy-300 hover:shadow-md transition">
-              <h2 className="font-semibold text-navy-900">{item.label}</h2>
-              <p className="mt-1 text-sm text-stone-500">{item.desc}</p>
-            </Link>
-          ))}
-        </div>
-      </main>
-    </div>
-  );
-}
+import { createClient } from "@/lib/supabase/server";
+export default async function AdminDashboardPage(){const supabase=await createClient();const{count}=await supabase.from("leads").select("id",{count:"exact",head:true});const items=[{label:"Projetos",href:"/admin/projetos",desc:"Portfólio e galerias de projetos"},{label:"Categorias",href:"/admin/categorias",desc:"Cards da home + imagens"},{label:"Conteúdo",href:"/admin/conteudo",desc:"Hero, textos e galeria"},{label:"Leads",href:"/admin/leads",desc:"Mensagens e contatos",badge:count??0},{label:"Configurações",href:"/admin/configuracoes",desc:"WhatsApp, SEO, logo e cores"}];return <div className="min-h-screen bg-stone-100"><header className="bg-white border-b border-stone-200"><div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"><Logo size="sm" href="/admin/dashboard"/><nav className="flex items-center gap-4 text-sm"><Link href="/admin/projetos" className="text-navy-800 hover:underline">Projetos</Link><Link href="/admin/categorias" className="text-navy-800 hover:underline">Categorias</Link><Link href="/admin/conteudo" className="text-navy-800 hover:underline">Conteúdo</Link><Link href="/admin/leads" className="font-semibold text-navy-800 hover:underline">Leads{(count??0)>0&&<span className="ml-1.5 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] text-white">{count}</span>}</Link><Link href="/admin/configuracoes" className="text-navy-800 hover:underline">Configurações</Link><Link href="/" className="text-stone-500 hover:underline">Ver site</Link></nav></div></header><main className="mx-auto max-w-6xl px-4 py-10"><h1 className="text-2xl font-semibold text-navy-900 mb-2">Dashboard</h1><p className="text-stone-600 mb-10">Painel administrativo da Nascimento Reformas.</p><div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">{items.map(item=><Link key={item.href} href={item.href} className="relative block p-6 rounded-xl bg-white border border-stone-200 hover:border-navy-300 hover:shadow-md transition"><h2 className="font-semibold text-navy-900">{item.label}</h2><p className="mt-1 text-sm text-stone-500">{item.desc}</p>{typeof item.badge==="number"&&item.badge>0&&<span className="absolute right-5 top-5 rounded-full bg-accent-500 px-2 py-1 text-[10px] font-bold text-white">{item.badge}</span>}</Link>)}</div></main></div>}

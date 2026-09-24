@@ -1,37 +1,4 @@
 import type { Metadata } from "next";
-import { SITE, formatWhatsappDisplay, resolveWhatsapp } from "@/lib/site";
-
-export const metadata: Metadata = {
-  title: "Política de Privacidade",
-  description: `Política de privacidade e tratamento de dados da ${SITE.name}.`,
-  robots: { index: false, follow: true },
-  alternates: { canonical: "/privacidade" },
-  openGraph: { url: "/privacidade", title: `Política de Privacidade | ${SITE.name}` },
-};
-
-export default function PrivacidadePage() {
-  const whatsapp = resolveWhatsapp(SITE.whatsapp);
-  return (
-    <div className="pt-28 pb-20">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-semibold text-navy-900 mb-8">Política de Privacidade</h1>
-        <div className="prose prose-stone max-w-none space-y-6 text-stone-600">
-          <p>Esta política descreve como a {SITE.name} trata dados pessoais eventualmente fornecidos por você ao entrar em contato pelo WhatsApp.</p>
-          <h2 className="text-xl font-semibold text-navy-900">Dados fornecidos</h2>
-          <p>Ao iniciar uma conversa pelo WhatsApp, você pode fornecer voluntariamente nome, telefone e outras informações necessárias para o atendimento. Este site não possui formulário próprio de contato.</p>
-          <h2 className="text-xl font-semibold text-navy-900">Estatísticas de visita</h2>
-          <p>O site utiliza o Vercel Web Analytics para estatísticas anônimas e agregadas de visitas, como páginas vistas, país e tipo de dispositivo. O Web Analytics não usa cookies de rastreamento e não permite rastreamento entre diferentes sites. Os cliques nos botões de WhatsApp também são contabilizados de forma anônima como eventos de analytics.</p>
-          <h2 className="text-xl font-semibold text-navy-900">Finalidade</h2>
-          <p>As informações fornecidas voluntariamente pelo WhatsApp são utilizadas para responder solicitações de orçamento, esclarecer dúvidas e tratar assuntos relacionados aos serviços de reforma.</p>
-          <h2 className="text-xl font-semibold text-navy-900">Compartilhamento</h2>
-          <p>Não vendemos dados pessoais para fins comerciais. O contato iniciado pelo WhatsApp está sujeito também às políticas da plataforma utilizada para a conversa.</p>
-          <h2 className="text-xl font-semibold text-navy-900">Direitos do titular</h2>
-          <p>Você pode solicitar acesso, correção ou exclusão de informações mantidas pela Nascimento Reformas entrando em contato pelo WhatsApp {formatWhatsappDisplay(whatsapp)}.</p>
-          <h2 className="text-xl font-semibold text-navy-900">Contato</h2>
-          <p>Para questões sobre privacidade: WhatsApp {formatWhatsappDisplay(whatsapp)}.</p>
-          <p className="text-sm text-stone-500 pt-8">Última atualização: setembro de 2026.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { SITE,formatWhatsappDisplay,resolveWhatsapp } from "@/lib/site";
+export const metadata:Metadata={title:"Política de Privacidade",description:"Política de privacidade e tratamento de dados da "+SITE.name+".",robots:{index:false,follow:true},alternates:{canonical:"/privacidade"},openGraph:{url:"/privacidade",title:"Política de Privacidade | "+SITE.name}};
+export default function PrivacidadePage(){const whatsapp=resolveWhatsapp(SITE.whatsapp);return <div className="pt-28 pb-20"><div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8"><h1 className="text-3xl font-semibold text-navy-900 mb-8">Política de Privacidade</h1><div className="space-y-6 text-stone-600"><p>Esta política descreve como a {SITE.name} trata dados pessoais fornecidos pelo formulário de orçamento deste site.</p><h2 className="text-xl font-semibold text-navy-900">Dados coletados</h2><p>O formulário pode coletar nome, telefone/WhatsApp, serviço de interesse e mensagem opcional. O e-mail não é obrigatório.</p><h2 className="text-xl font-semibold text-navy-900">Finalidade e armazenamento</h2><p>Os dados são usados somente para responder ao pedido de orçamento e ficam armazenados de forma segura no painel administrativo. Se você solicitar, os dados podem ser excluídos.</p><h2 className="text-xl font-semibold text-navy-900">WhatsApp</h2><p>Depois do envio, o site abre uma conversa no WhatsApp com os dados preenchidos para facilitar o atendimento. O uso do WhatsApp também está sujeito às políticas da própria plataforma.</p><h2 className="text-xl font-semibold text-navy-900">Estatísticas</h2><p>O site utiliza Vercel Web Analytics para estatísticas agregadas de visita e eventos anônimos de interação.</p><h2 className="text-xl font-semibold text-navy-900">Direitos do titular</h2><p>Você pode solicitar acesso, correção ou exclusão dos dados mantidos pela {SITE.name} pelo WhatsApp {formatWhatsappDisplay(whatsapp)}.</p><p className="pt-8 text-sm text-stone-500">Última atualização: setembro de 2026.</p></div></div></div>}
