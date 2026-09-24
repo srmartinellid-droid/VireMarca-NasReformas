@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: SITE.description,
   keywords: ["reformas residenciais", "reforma Palhoça", "reforma Florianópolis", "drywall Grande Florianópolis", "gesso Florianópolis", "hidráulica residencial", "reforma alto padrão SC"],
   authors: [{ name: SITE.name }],
-  icons: { icon: "/icon.svg", shortcut: "/icon.svg", apple: "/apple-icon" },
+  icons: { icon: "/icon", shortcut: "/icon", apple: "/apple-icon" },
   openGraph: {
     type: "website",
     locale: "pt_BR",
