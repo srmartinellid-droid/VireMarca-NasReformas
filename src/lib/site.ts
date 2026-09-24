@@ -25,8 +25,11 @@ export function resolveWhatsapp(dbValue?: string | null): string {
 }
 
 export function formatWhatsappDisplay(phone: string): string {
-  const resolved = resolveWhatsapp(phone);
-  return `(${resolved.slice(2, 4)}) ${resolved.slice(5, 10)}-${resolved.slice(10)}`;
+  const digits = phone.replace(/\D/g, "");
+  const normalized = digits.startsWith("55") ? digits.slice(2) : digits;
+  const ddd = normalized.slice(0, 2);
+  const number = normalized.slice(2, 11);
+  return `(${ddd}) ${number.slice(0, 5)}-${number.slice(5)}`;
 }
 
 export const SERVICES = [
