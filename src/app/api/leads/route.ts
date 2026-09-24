@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { SERVICES } from "@/lib/site";
-const serviceNames=SERVICES.map((service)=>service.title);
+const serviceNames: string[]=SERVICES.map((service)=>service.title);
 const schema=z.object({name:z.string().trim().min(2).max(120),phone:z.string().trim().min(10).max(20),service:z.string().trim().min(2).max(100).refine((value)=>serviceNames.includes(value),"Serviço inválido"),message:z.string().trim().max(1000).optional().default(""),source:z.string().trim().min(1).max(40).default("cta"),website:z.string().max(0).optional().default("")});
 const attempts=new Map<string,number>(); const WINDOW_MS=20000;
 function validBrazilianPhone(value:string){const digits=value.replace(/\D/g,"");const local=digits.startsWith("55")?digits.slice(2):digits;return /^\d{10,11}$/.test(local)&&(!local.startsWith("9")||local.length===11)}
