@@ -34,7 +34,8 @@ export function Footer({ whatsapp, email, instagram, cnpj }: { whatsapp: string;
             <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[.2em] text-stone-500">Contato</h3>
             <ul className="space-y-3 text-sm">
               <li><a href={buildWhatsAppUrl(whatsapp)} target="_blank" rel="noopener noreferrer" className="font-medium text-navy-900 transition-colors hover:text-accent-600">WhatsApp: {formatWhatsappDisplay(resolveWhatsapp(whatsapp))}</a></li>
-              <li className="text-stone-500">{SITE.region}</li>\n              {email && <li><a href={`mailto:${email}`} className="text-stone-500 transition-colors hover:text-navy-900">{email}</a></li>}\n              {instagram && <li><a href={instagram} target="_blank" rel="noopener noreferrer" className="text-stone-500 transition-colors hover:text-navy-900">Instagram</a></li>}\n              {cnpj && <li className="text-stone-500">CNPJ: {cnpj}</li>}
+              <li className="text-stone-500">{SITE.region}</li>
+              {email && <li><a href={`mailto:${email}`} className="text-stone-500 transition-colors hover:text-navy-900">{email}</a></li>}\n              {instagram && <li><a href={instagram} target="_blank" rel="noopener noreferrer" className="text-stone-500 transition-colors hover:text-navy-900">Instagram</a></li>}\n              {cnpj && <li className="text-stone-500">CNPJ: {cnpj}</li>}
             </ul>
           </div>
         </div>
